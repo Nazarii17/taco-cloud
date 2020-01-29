@@ -32,7 +32,12 @@ public class JdbcIngredientRepository
     @Override
     public Iterable<Ingredient> findAll() {
         return jdbc.query("select id, name, type from Ingredient",
-                this::mapRowToIngredient);
+                new RowMapper<Ingredient>() {
+                    @Override
+                    public Ingredient mapRow(ResultSet rs, int rowNum) throws SQLException {
+                        return JdbcIngredientRepository.this.mapRowToIngredient(rs, rowNum);
+                    }
+                });
     }
 
     // tag::findOne[]
