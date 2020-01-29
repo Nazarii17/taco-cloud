@@ -1,60 +1,77 @@
+// tag::allButDetailProperties[]
 package tacos;
 
-import javax.validation.constraints.Digits;
-import javax.validation.constraints.Pattern;
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToMany;
+import javax.persistence.PrePersist;
+import javax.persistence.Table;
+import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
+
 import org.hibernate.validator.constraints.CreditCardNumber;
 
 import lombok.Data;
 
 @Data
-public class Order {
+@Entity
+@Table(name = "Taco_Order")
+public class Order implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+
     private Date placedAt;
 
-    //end::allButValidation[]
-    @NotBlank(message="Name is required")
-    //tag::allButValidation[]
-    private String name;
-    //end::allButValidation[]
+    //end::allButDetailProperties[]
+    @NotBlank(message = "Delivery name is required")
+    private String deliveryName;
 
-    @NotBlank(message="Street is required")
-    //tag::allButValidation[]
-    private String street;
-    //end::allButValidation[]
+    @NotBlank(message = "Street is required")
+    private String deliveryStreet;
 
-    @NotBlank(message="City is required")
-    //tag::allButValidation[]
-    private String city;
-    //end::allButValidation[]
+    @NotBlank(message = "City is required")
+    private String deliveryCity;
 
-    @NotBlank(message="State is required")
-    //tag::allButValidation[]
-    private String state;
-    //end::allButValidation[]
+    @NotBlank(message = "State is required")
+    private String deliveryState;
 
-    @NotBlank(message="Zip code is required")
-    //tag::allButValidation[]
-    private String zip;
-    //end::allButValidation[]
+    @NotBlank(message = "Zip code is required")
+    private String deliveryZip;
 
-    @CreditCardNumber(message="Not a valid credit card number")
-    //tag::allButValidation[]
+    @CreditCardNumber(message = "Not a valid credit card number")
     private String ccNumber;
-    //end::allButValidation[]
 
-    @Pattern(regexp="^(0[1-9]|1[0-2])([\\/])([1-9][0-9])$",
-            message="Must be formatted MM/YY")
-    //tag::allButValidation[]
+    @Pattern(regexp = "^(0[1-9]|1[0-2])([\\/])([1-9][0-9])$",
+            message = "Must be formatted MM/YY")
     private String ccExpiration;
-    //end::allButValidation[]
 
-    @Digits(integer=3, fraction=0, message="Invalid CVV")
-    //tag::allButValidation[]
+    @Digits(integer = 3, fraction = 0, message = "Invalid CVV")
     private String ccCVV;
 
+
+    @ManyToMany(targetEntity = Taco.class)
+    private List<Taco> tacos = new ArrayList<>();
+
+    public void addDesign(Taco design) {
+        this.tacos.add(design);
+    }
+
+    @PrePersist
+    void placedAt() {
+        this.placedAt = new Date();
+    }
+
 }
-//end::allButValidation[]
-//end::all[]
+
